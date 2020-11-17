@@ -851,7 +851,7 @@
 //#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
 
 // Force the use of the probe for Z-axis homing
-//#define USE_PROBE_FOR_Z_HOMING
+#define USE_PROBE_FOR_Z_HOMING
 
 /**
  * Z_MIN_PROBE_PIN
@@ -993,20 +993,20 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { 28, 0, -4.6 }
+#define NOZZLE_TO_PROBE_OFFSET { 28, 0, -2.95 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
 #define PROBING_MARGIN 5
 
 // X and Y axis travel speed (mm/min) between probes
-#define XY_PROBE_SPEED (100*60)
+#define XY_PROBE_SPEED (HOMING_FEEDRATE_XY)
 
 // Feedrate (mm/min) for the first approach when double-probing (MULTIPLE_PROBING == 2)
-#define Z_PROBE_SPEED_FAST (6*60)
+#define Z_PROBE_SPEED_FAST (HOMING_FEEDRATE_Z)
 
 // Feedrate (mm/min) for the "accurate" probe of each point
-#define Z_PROBE_SPEED_SLOW (Z_PROBE_SPEED_FAST / 3)
+#define Z_PROBE_SPEED_SLOW (Z_PROBE_SPEED_FAST / 2)
 
 /**
  * Multiple Probing
@@ -1034,12 +1034,12 @@
  * Example: `M851 Z-5` with a CLEARANCE of 4  =>  9mm from bed to nozzle.
  *     But: `M851 Z+1` with a CLEARANCE of 2  =>  2mm from bed to nozzle.
  */
-#define Z_CLEARANCE_DEPLOY_PROBE    0 // Z Clearance for Deploy/Stow
+#define Z_CLEARANCE_DEPLOY_PROBE    4 // Z Clearance for Deploy/Stow
 #define Z_CLEARANCE_BETWEEN_PROBES  4 // Z Clearance between probe points
 #define Z_CLEARANCE_MULTI_PROBE     2 // Z Clearance between multiple probes
 #define Z_AFTER_PROBING             Z_HOMING_HEIGHT // Z position after probing is done
 
-#define Z_PROBE_LOW_POINT          -6 // Farthest distance below the trigger-point to go before stopping
+#define Z_PROBE_LOW_POINT          -5 // Farthest distance below the trigger-point to go before stopping
 
 // For M851 give a range for adjusting the Z probe offset
 #define Z_PROBE_OFFSET_RANGE_MIN -10
@@ -1129,13 +1129,13 @@
 // @section machine
 
 // The size of the print bed
-#define X_BED_SIZE 145
+#define X_BED_SIZE 150
 #define Y_BED_SIZE 145
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
-#define X_MIN_POS -33
+#define X_MIN_POS -28
 #define Y_MIN_POS -8
-#define Z_MIN_POS -6
+#define Z_MIN_POS 0
 #define X_MAX_POS X_BED_SIZE
 #define Y_MAX_POS Y_BED_SIZE
 #define Z_MAX_POS 145
@@ -1377,7 +1377,7 @@
 #if ENABLED(LCD_BED_LEVELING)
   #define MESH_EDIT_Z_STEP  0.025 // (mm) Step size while manually probing Z axis.
   #define LCD_PROBE_Z_RANGE 5     // (mm) Z Range centered on Z_MIN_POS for LCD Z adjustment
-  #define MESH_EDIT_MENU        // Add a menu to edit mesh points
+  //#define MESH_EDIT_MENU        // Add a menu to edit mesh points
 #endif
 
 // Add a menu item to move between bed corners for manual bed adjustment
@@ -1388,19 +1388,13 @@
   #define LEVEL_CORNERS_HEIGHT      0.0   // (mm) Z height of nozzle at leveling points
   #define LEVEL_CORNERS_Z_HOP       Z_CLEARANCE_BETWEEN_PROBES   // (mm) Z height of nozzle between leveling points
   #define LEVEL_CENTER_TOO              // Move to the center after the last corner
-  #if ENABLED(LEVEL_CENTER_TOO)
-    #define LEVEL_CORNERS_USE_PROBE // use probe to ajust screws
-    #if ENABLED(LEVEL_CORNERS_USE_PROBE)
-      #define LEVEL_CORNERS_USE_PROBE_TOLERANCE 1 //mm
-    #endif    
-  #endif
 #endif
 
 /**
  * Commands to execute at the end of G29 probing.
  * Useful to retract or move the Z probe out of the way.
  */
-#define Z_PROBE_END_SCRIPT "G27"
+#define Z_PROBE_END_SCRIPT "G28XY"
 
 // @section homing
 
@@ -1422,15 +1416,15 @@
 // - Move the Z probe (or nozzle) to a defined XY point before Z Homing.
 // - Prevent Z homing when the Z probe is outside bed area.
 //
-//#define Z_SAFE_HOMING
+#define Z_SAFE_HOMING
 
 #if ENABLED(Z_SAFE_HOMING)
-  #define Z_SAFE_HOMING_X_POINT X_CENTER  // X point for Z homing
-  #define Z_SAFE_HOMING_Y_POINT Y_CENTER  // Y point for Z homing
+  #define Z_SAFE_HOMING_X_POINT PROBING_MARGIN //X_CENTER  // X point for Z homing
+  #define Z_SAFE_HOMING_Y_POINT PROBING_MARGIN //Y_CENTER  // Y point for Z homing
 #endif
 
 // Homing speeds (mm/min)
-#define HOMING_FEEDRATE_XY (50*60)
+#define HOMING_FEEDRATE_XY (40*60)
 #define HOMING_FEEDRATE_Z  (5*60)
 
 // Validate that endstops are triggered on homing moves
@@ -1568,8 +1562,8 @@
   //#define NOZZLE_PARK_X_ONLY          // X move only is required to park
   //#define NOZZLE_PARK_Y_ONLY          // Y move only is required to park
   #define NOZZLE_PARK_Z_RAISE_MIN   5   // (mm) Always raise Z by at least this distance
-  #define NOZZLE_PARK_XY_FEEDRATE   HOMING_FEEDRATE_XY   // (mm/s) X and Y axes feedrate (also used for delta Z axis)
-  #define NOZZLE_PARK_Z_FEEDRATE    HOMING_FEEDRATE_Z   // (mm/s) Z axis feedrate (not used for delta printers)
+  #define NOZZLE_PARK_XY_FEEDRATE   (HOMING_FEEDRATE_XY/60)   // (mm/s) X and Y axes feedrate (also used for delta Z axis)
+  #define NOZZLE_PARK_Z_FEEDRATE    (HOMING_FEEDRATE_Z/60)   // (mm/s) Z axis feedrate (not used for delta printers)
 #endif
 
 /**
