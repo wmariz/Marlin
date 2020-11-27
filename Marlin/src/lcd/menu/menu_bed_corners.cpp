@@ -53,23 +53,16 @@
   #ifndef LEVEL_CORNERS_PROBE_TOLERANCE
     #define LEVEL_CORNERS_PROBE_TOLERANCE 0.1
   #endif
-  #ifndef LEVEL_CORNERS_FEEDBACK_FREQUENCY_DURATION_MS
-    #define LEVEL_CORNERS_FEEDBACK_FREQUENCY_DURATION_MS 0
-  #endif
-  #if LEVEL_CORNERS_FEEDBACK_FREQUENCY_DURATION_MS > 0
-    #ifndef LEVEL_CORNERS_FEEDBACK_FREQUENCY_HZ
-      #define LEVEL_CORNERS_FEEDBACK_FREQUENCY_HZ 600
-    #endif
+  #if ENABLED(LEVEL_CORNERS_AUDIO_FEEDBACK)
     #include "../../libs/buzzer.h"
-    #define PROBE_BUZZ() (BUZZ(LEVEL_CORNERS_FEEDBACK_FREQUENCY_DURATION_MS, LEVEL_CORNERS_FEEDBACK_FREQUENCY_HZ))
+    #define PROBE_BUZZ() BUZZ(200, 600)
   #else
     #define PROBE_BUZZ() NOOP
   #endif
   static float last_z;
-  bool wait_for_probe;
-  bool probe_triggered;
-  bool corner_probing_done;
-  int good_points;
+  static bool corner_probing_done;
+  static bool verify_corner;
+  static int good_points;
 #endif
 
 static_assert(LEVEL_CORNERS_Z_HOP >= 0, "LEVEL_CORNERS_Z_HOP must be >= 0. Please update your configuration.");
@@ -113,10 +106,15 @@ static int8_t bed_corner;
     #endif
     TERN_(QUIET_PROBING, probe.set_probing_paused(true));
 
-    do_blocking_move_to_z(last_z - (LEVEL_CORNERS_PROBE_TOLERANCE), manual_feedrate_mm_s.z);// Move down until the probe is triggered
-    probe_triggered = TEST(endstops.trigger_state(), TERN(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN, Z_MIN, Z_MIN_PROBE));// Check to see if the probe was triggered
+    // Move down until the probe is triggered
+    do_blocking_move_to_z(last_z - (LEVEL_CORNERS_PROBE_TOLERANCE), manual_feedrate_mm_s.z);
 
+    // Check to see if the probe was triggered
+    bool probe_triggered = TEST(endstops.trigger_state(), TERN(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN, Z_MIN, Z_MIN_PROBE));
     if (!probe_triggered) {
+
+      static bool wait_for_probe;
+
       ui.goto_screen([]{
         MenuItem_confirm::select_screen(
           GET_TEXT(MSG_BUTTON_DONE), GET_TEXT(MSG_BUTTON_SKIP)
@@ -139,6 +137,8 @@ static int8_t bed_corner;
         idle();
       }
       wait_for_probe = false;
+
+      TERN_(LEVEL_CORNERS_VERIFY_RAISED, verify_corner = true);
     }
 
     TERN_(QUIET_PROBING, probe.set_probing_paused(false));
@@ -151,13 +151,15 @@ static int8_t bed_corner;
       endstops.hit_on_purpose();
       if (!WITHIN(current_position.z, last_z - (LEVEL_CORNERS_PROBE_TOLERANCE), last_z + (LEVEL_CORNERS_PROBE_TOLERANCE))) {
         last_z = current_position.z;
-        good_points = 1;
+        good_points = 0;
       }
-      good_points++;
+      if (!verify_corner) good_points++;
     }
 
     if (!corner_probing_done) {
-      if (++bed_corner > 3) bed_corner = 0;
+      if (!verify_corner) bed_corner++;
+      if (bed_corner > 3) bed_corner = 0;
+      verify_corner = false;
       if (good_points < 4)
         _lcd_level_bed_corners_probing();
       else {
@@ -241,9 +243,8 @@ void _lcd_level_bed_corners() {
 
   #if ENABLED(LEVEL_CORNERS_USE_PROBE)
     last_z = LEVEL_CORNERS_HEIGHT;
-    wait_for_probe = false;
-    probe_triggered = false;
     corner_probing_done = false;
+    verify_corner = false;
     good_points = 0;
   #endif
 
