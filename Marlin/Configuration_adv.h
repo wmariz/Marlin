@@ -795,11 +795,12 @@
 //
 // Add the G35 command to read bed corners to help adjust screws. Requires a bed probe.
 //
-//#define ASSISTED_TRAMMING
+#define ASSISTED_TRAMMING
 #if ENABLED(ASSISTED_TRAMMING)
 
   // Define positions for probing points, use the hotend as reference not the sensor.
-  #define TRAMMING_POINT_XY { {  PROBING_MARGIN, PROBING_MARGIN }, { X_BED_SIZE - PROBING_MARGIN,  PROBING_MARGIN }, { X_BED_SIZE - PROBING_MARGIN, Y_BED_SIZE - PROBING_MARGIN }, { PROBING_MARGIN, Y_BED_SIZE - PROBING_MARGIN } }
+  //#define TRAMMING_POINT_XY { {  PROBING_MARGIN, PROBING_MARGIN }, { X_BED_SIZE - PROBING_MARGIN,  PROBING_MARGIN }, { (X_BED_SIZE - PROBING_MARGIN), Y_BED_SIZE - PROBING_MARGIN }, { PROBING_MARGIN, Y_BED_SIZE - PROBING_MARGIN } }
+  #define TRAMMING_POINT_XY {{5,5},{135,5},{135,135},{5,135}}
 
   // Define positions names for probing points.
   #define TRAMMING_POINT_NAME_1 "Front-Left"
@@ -808,11 +809,11 @@
   #define TRAMMING_POINT_NAME_4 "Back-Left"
 
   #define RESTORE_LEVELING_AFTER_G35    // Enable to restore leveling setup after operation
-  //#define REPORT_TRAMMING_MM          // Report Z deviation (mm) for each point relative to the first
+  #define REPORT_TRAMMING_MM          // Report Z deviation (mm) for each point relative to the first
 
-  //#define ASSISTED_TRAMMING_MENU_ITEM // Add a menu item to run G35 Assisted Tramming (MarlinUI)
-  //#define ASSISTED_TRAMMING_WIZARD    // Make the menu item open a Tramming Wizard sub-menu
-  //#define ASSISTED_TRAMMING_WAIT_POSITION { X_CENTER, Y_CENTER, 30 } // Move the nozzle out of the way for adjustment
+  #define ASSISTED_TRAMMING_MENU_ITEM // Add a menu item to run G35 Assisted Tramming (MarlinUI)
+  #define ASSISTED_TRAMMING_WIZARD    // Make the menu item open a Tramming Wizard sub-menu
+  #define ASSISTED_TRAMMING_WAIT_POSITION { X_CENTER, Y_CENTER, 30 } // Move the nozzle out of the way for adjustment
 
   /**
    * Screw thread:
@@ -1096,7 +1097,7 @@
   //#define TURBO_BACK_MENU_ITEM
 
   // Add a mute option to the LCD menu
-  //#define SOUND_MENU_ITEM
+  #define SOUND_MENU_ITEM
 
   /**
    * LED Control Menu
