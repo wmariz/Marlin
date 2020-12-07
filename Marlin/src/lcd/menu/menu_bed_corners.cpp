@@ -113,7 +113,8 @@ static int8_t bed_corner;
     bool probe_triggered = TEST(endstops.trigger_state(), TERN(Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN, Z_MIN, Z_MIN_PROBE));
     if (!probe_triggered) {
 
-      static bool wait_for_probe;
+      static bool wait_for_probe = true;
+      TERN_(LEVEL_CORNERS_VERIFY_RAISED, verify_corner = true);
 
       ui.goto_screen([]{
         MenuItem_confirm::select_screen(
@@ -123,14 +124,16 @@ static int8_t bed_corner;
                 TERN_(HAS_LEVELING, set_bed_leveling_enabled(leveling_was_active));
                 ui.goto_previous_screen_no_defer();
             }
-          , []{ wait_for_probe = false; }
+          , []{ wait_for_probe = false;
+                verify_corner = false;
+                good_points++;
+            }
           , GET_TEXT(MSG_LEVEL_CORNERS_RAISE)
           , (const char*)nullptr, PSTR("")
         );
       });
       ui.set_selection(true);
 
-      wait_for_probe = true;
       while (wait_for_probe && !probe_triggered) {
         probe_triggered = PROBE_TRIGGERED();
         if (probe_triggered) PROBE_BUZZ();
@@ -138,7 +141,6 @@ static int8_t bed_corner;
       }
       wait_for_probe = false;
 
-      TERN_(LEVEL_CORNERS_VERIFY_RAISED, verify_corner = true);
     }
 
     TERN_(QUIET_PROBING, probe.set_probing_paused(false));
