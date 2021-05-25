@@ -222,7 +222,7 @@
     #define LCD_BACKLIGHT_PIN               -1
 
   #else
-    #error "Only CR10_STOCKDISPLAY, ZONESTAR_LCD, ENDER2_STOCKDISPLAY, MKS_MINI_12864, and MKS_LCD12864 are currently supported on the BIGTREE_SKR_E3_DIP."
+    #error "Only CR10_STOCKDISPLAY, ZONESTAR_LCD, ENDER2_STOCKDISPLAY, MKS_MINI_12864, and MKS_LCD12864A/B are currently supported on the BIGTREE_SKR_E3_DIP."
   #endif
 
 #endif // HAS_WIRED_LCD
@@ -280,7 +280,7 @@
   #define SD_DETECT_PIN                     PC4
 #elif SD_CONNECTION_IS(LCD) && BOTH(TOUCH_UI_FTDI_EVE, LCD_FYSETC_TFT81050)
   #define SD_DETECT_PIN                     PA15
-  #define SS_PIN                            PA10
+  #define SD_SS_PIN                         PA10
 #elif SD_CONNECTION_IS(CUSTOM_CABLE)
   #error "SD CUSTOM_CABLE is not compatible with SKR E3 DIP."
 #endif
