@@ -814,7 +814,7 @@
  * Override with M92
  *                                      X, Y, Z, E0 [, E1[, E2...]]
  */
-#define DEFAULT_AXIS_STEPS_PER_UNIT   { 160.65, 160.65, 3200, 281.5 }
+#define DEFAULT_AXIS_STEPS_PER_UNIT   { 159, 159, 3210, 281.5 }
 
 /**
  * Default Max Feed Rate (mm/s)
@@ -1538,8 +1538,8 @@
 #define LEVEL_BED_CORNERS
 
 #if ENABLED(LEVEL_BED_CORNERS)
-  #define LEVEL_CORNERS_INSET_LFRB { PROBING_MARGIN, PROBING_MARGIN, PROBING_MARGIN, PROBING_MARGIN } // (mm) Left, Front, Right, Back insets
-  //#define LEVEL_CORNERS_HEIGHT      0.0   // (mm) Z height of nozzle at leveling points
+  #define LEVEL_CORNERS_INSET_LFRB { 30, 30, 30, 30 } // (mm) Left, Front, Right, Back insets
+  #define LEVEL_CORNERS_HEIGHT      0.0   // (mm) Z height of nozzle at leveling points
   #define LEVEL_CORNERS_Z_HOP       Z_CLEARANCE_BETWEEN_PROBES   // (mm) Z height of nozzle between leveling points
   //#define LEVEL_CENTER_TOO              // Move to the center after the last corner
   #define LEVEL_CORNERS_USE_PROBE
@@ -1744,8 +1744,8 @@
   //#define NOZZLE_PARK_X_ONLY          // X move only is required to park
   //#define NOZZLE_PARK_Y_ONLY          // Y move only is required to park
   #define NOZZLE_PARK_Z_RAISE_MIN   5   // (mm) Always raise Z by at least this distance
-  #define NOZZLE_PARK_XY_FEEDRATE   (XY_PROBE_SPEED/60)   // (mm/s) X and Y axes feedrate (also used for delta Z axis)
-  #define NOZZLE_PARK_Z_FEEDRATE    (Z_PROBE_SPEED_FAST/60)   // (mm/s) Z axis feedrate (not used for delta printers)
+  #define NOZZLE_PARK_XY_FEEDRATE   (XY_PROBE_FEEDRATE/60)   // (mm/s) X and Y axes feedrate (also used for delta Z axis)
+  #define NOZZLE_PARK_Z_FEEDRATE    (Z_PROBE_FEEDRATE_FAST/60)   // (mm/s) Z axis feedrate (not used for delta printers)
 #endif
 
 /**
