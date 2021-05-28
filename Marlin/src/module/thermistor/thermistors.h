@@ -182,6 +182,12 @@ typedef struct { int16_t value; celsius_t celsius; } temp_entry_t;
 #if ANY_THERMISTOR_IS(332) // Like table 1, but with 3V3 as input voltage for DUE
   #include "thermistor_332.h"
 #endif
+#if ANY_THERMISTOR_IS(598) 
+  #include "thermistor_598.h"
+#endif
+#if ANY_THERMISTOR_IS(599) 
+  #include "thermistor_599.h"
+#endif
 #if ANY_THERMISTOR_IS(666) // beta25 = UNK, R25 = 200K, Pull-up = 10 kOhm, "Unidentified 200K NTC thermistor (Einstart S)"
   #include "thermistor_666.h"
 #endif
